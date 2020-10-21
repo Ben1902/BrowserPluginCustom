@@ -1,0 +1,25 @@
+#!/bin/sh
+# bump 78
+set -e
+
+export NODE_PATH=$PWD
+export SV_ROOT=$SCRATCH/sv1
+
+if grep "Raspberry Pi 4" /proc/cpuinfo; then
+    read -d. uptime < /proc/uptime
+    if [ $uptime -lt 300 ]; then
+        sleep 15 # delay for update confirm
+    else
+        sleep 4
+    fi
+    sv d /service/info-beamer
+fi
+
+rm -rf $SV_ROOT
+cp -r .sv $SV_ROOT
+cd $SV_ROOT
+chmod 755 chromium/install-certs
+chmod 755 */run
+
+# Do not exec here, so the runsvdir command is killable.
+runsvdir .
